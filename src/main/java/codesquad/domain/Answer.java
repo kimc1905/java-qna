@@ -7,11 +7,13 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
-public class Answer extends AbstractEntity implements UrlGeneratable {
+public class Answer extends AbstractEntity implements UrlGeneratable, Content {
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
     private User writer;
@@ -50,8 +52,18 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return question;
     }
 
+    @Override
+    public long getContentId() {
+        return getId();
+    }
+
     public String getContents() {
         return contents;
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.ANSWER;
     }
 
     public void toQuestion(Question question) {
@@ -64,6 +76,18 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void update(User loginUser, String contents) {
+        if(!isOwner(loginUser))
+            throw new UnAuthorizedException();
+        this.contents = contents;
+    }
+
+    public void delete(User loginUser) throws CannotDeleteException {
+        if(!isOwner(loginUser) && !question.isOwner(loginUser))
+            throw new CannotDeleteException("Answer must be deleted by writer or question owner");
+        deleted = true;
     }
 
     @Override
