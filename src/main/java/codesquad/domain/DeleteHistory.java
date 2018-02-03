@@ -37,12 +37,6 @@ public class DeleteHistory {
         this.deletedBy = deletedBy;
     }
 
-    public DeleteHistory(Content content, User deletedBy) {
-        this.contentType = content.getContentType();
-        this.contentId = content.getContentId();
-        this.deletedBy = deletedBy;
-    }
-
     @Override
     public String toString() {
         return "DeleteHistory [id=" + id + ", contentType=" + contentType + ", contentId=" + contentId + ", deletedBy="

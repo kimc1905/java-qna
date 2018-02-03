@@ -68,10 +68,17 @@ public class QuestionTest {
     @Test
     public void delete_with_answer() throws Exception {
         question.writeBy(JAVAJIGI);
-        question.addAnswer(new Answer(SANJIGI, "답변"));
-        question.delete(JAVAJIGI);
+        question.addAnswer(new Answer(JAVAJIGI, "답변"));
+        question.deleteWithAnswers(JAVAJIGI);
         assertThat(question.isDeleted()).isTrue();
         assertThat(question.getAnswerCount()).isEqualTo(0);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_with_other_answer() throws Exception {
+        question.writeBy(JAVAJIGI);
+        question.addAnswer(new Answer(SANJIGI, "답변"));
+        question.deleteWithAnswers(JAVAJIGI);
     }
 
     @Test(expected = CannotDeleteException.class)

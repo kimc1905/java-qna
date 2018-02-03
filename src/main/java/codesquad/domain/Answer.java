@@ -1,93 +1,37 @@
 package codesquad.domain;
 
+import support.domain.UrlGeneratable;
+
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
-
-import codesquad.CannotDeleteException;
-import codesquad.UnAuthorizedException;
-import support.domain.AbstractEntity;
-import support.domain.UrlGeneratable;
 
 @Entity
-public class Answer extends AbstractEntity implements UrlGeneratable, Content {
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
-    private User writer;
+public class Answer extends Contents implements UrlGeneratable {
 
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_to_question"))
     private Question question;
 
-    @Size(min = 5)
-    @Lob
-    private String contents;
-
-    private boolean deleted = false;
-
     public Answer() {
     }
 
     public Answer(User writer, String contents) {
-        this.writer = writer;
-        this.contents = contents;
+        super(writer, contents);
     }
 
     public Answer(Long id, User writer, Question question, String contents) {
-        super(id);
-        this.writer = writer;
+        super(id, writer, contents);
         this.question = question;
-        this.contents = contents;
-        this.deleted = false;
-    }
-
-    public User getWriter() {
-        return writer;
     }
 
     public Question getQuestion() {
         return question;
     }
 
-    @Override
-    public long getContentId() {
-        return getId();
-    }
-
-    public String getContents() {
-        return contents;
-    }
-
-    @Override
-    public ContentType getContentType() {
-        return ContentType.ANSWER;
-    }
-
     public void toQuestion(Question question) {
         this.question = question;
-    }
-
-    public boolean isOwner(User loginUser) {
-        return writer.equals(loginUser);
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void update(User loginUser, String contents) {
-        if(!isOwner(loginUser))
-            throw new UnAuthorizedException();
-        this.contents = contents;
-    }
-
-    public void delete(User loginUser) throws CannotDeleteException {
-        if(!isOwner(loginUser) && !question.isOwner(loginUser))
-            throw new CannotDeleteException("Answer must be deleted by writer or question owner");
-        deleted = true;
     }
 
     @Override
@@ -97,6 +41,11 @@ public class Answer extends AbstractEntity implements UrlGeneratable, Content {
 
     @Override
     public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+        return "Answer [id=" + getId() + ", writer=" + getWriter() + ", contents=" + getContents() + "]";
+    }
+
+    @Override
+    public DeleteHistory audit() {
+        return new DeleteHistory(ContentType.ANSWER, getId(), getWriter());
     }
 }

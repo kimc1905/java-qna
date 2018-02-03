@@ -92,7 +92,7 @@ public class QnaServiceTest {
 
     @Test
     public void delete_with_answer() throws Exception{
-        Answer answer = new Answer(OTHER_WRITER, "댓글입니다.1");
+        Answer answer = new Answer(DEFAULT_WRITER, "댓글입니다.1");
         DEFAULT_QUESTION.addAnswer(answer);
         given(answerRepository.findOne(answer.getId())).willReturn(answer);
         given(answerRepository.save(answer)).willReturn(answer);
@@ -101,7 +101,7 @@ public class QnaServiceTest {
         given(questionRepository.findOne(DEFAULT_QUESTION.getId())).willReturn(null);
         assertThat(qnaService.findById(DEFAULT_QUESTION.getId())).isNull();
         ArgumentCaptor<List> valueCapture = ArgumentCaptor.forClass(List.class);
-        verify(deleteHistoryService, times(1)).saveAll(valueCapture.capture());
+        verify(deleteHistoryService).saveAll(valueCapture.capture());
         assertThat(valueCapture.getValue().size()).isEqualTo(2);
     }
 

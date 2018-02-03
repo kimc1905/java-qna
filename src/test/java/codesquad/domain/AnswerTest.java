@@ -48,13 +48,6 @@ public class AnswerTest {
         assertThat(answer.isDeleted()).isTrue();
     }
 
-    @Test()
-    public void delete_by_question_writer() throws Exception {
-        Answer answer = new Answer(1L, SANJIGI, QUESTION, "자문자답: 네");
-        answer.delete(JAVAJIGI);
-        assertThat(answer.isDeleted()).isTrue();
-    }
-
     @Test(expected = CannotDeleteException.class)
     public void delete_not_owner() throws Exception {
         Answer answer = new Answer(1L, SANJIGI, QUESTION, "자문자답: 네");
